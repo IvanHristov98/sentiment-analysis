@@ -1,7 +1,6 @@
 import re
-from typing import List, Pattern
+from typing import List, Pattern, Tuple, Dict
 
-import spacy
 from spacy.lang.en import English
 from spacy.tokens import Token
 import nltk
@@ -14,19 +13,46 @@ _URL_REGEX = re.compile(r"^https?:\/\/\S+|www\.\S+$")
 _PUNCT_REGEX = re.compile(r"[^\w\s]")
 _NEWLINE_REGEX = re.compile(r"\n")
 _EMPTY_REGEX = re.compile(r"^\s*$")
+_CONTAINS_DIGIT_REGEX = re.compile(r"\d")
 
-_WORD_FEATURE_COUNT = 2000
-_BIGRAM_FEAUTRE_COUNT = 1000
-_TRIGRAM_FEATURE_COUNT = 500
-
-
-def train_classifier(corpus: List[Comment]):
-    _features(corpus)
+_WORD_FEATURE_COUNT = 500
+_BIGRAM_FEAUTRE_COUNT = 250
+_TRIGRAM_FEATURE_COUNT = 100
 
 
-def _features(corpus: List[Comment]) -> List[str]:
-    nlp = spacy.load("en_core_web_sm")
+def classifier(nlp: English, corpus: List[Comment]):
+    print("Getting features...")
+    features = extract_features(nlp, corpus)
+    print("Labeling the features...")
+    labeled_feature_sets = _labeled_feature_sets(nlp, corpus, features)
 
+    print("Training the NBC...")
+    return nltk.NaiveBayesClassifier.train(labeled_feature_sets)
+
+
+def _labeled_feature_sets(
+    nlp: English, corpus: List[Comment], features: List[str]
+) -> List[Tuple[Dict[str, bool], str]]:
+    labeled_feature_sets = []
+
+    for comment in corpus:
+        comment_features = _feature_set(nlp, comment, features)
+        labeled_feature_sets.append((comment_features, comment.sentiment.value))
+
+    return labeled_feature_sets
+
+
+def _feature_set(nlp: English, comment: Comment, features: List[str]) -> Dict[str, bool]:
+    comment_features = set(extract_features(nlp, [comment]))
+    feature_set = {}
+
+    for feature in features:
+        feature_set[feature] = feature in comment_features
+
+    return feature_set
+
+
+def extract_features(nlp: English, corpus: List[Comment]) -> List[str]:
     words = []
     bigrams = []
     trigrams = []
@@ -39,8 +65,8 @@ def _features(corpus: List[Comment]) -> List[str]:
         tokens = _lowercase(tokens)
 
         words += tokens
-        bigrams += list(nltk.bigrams(tokens))
-        trigrams += list(nltk.trigrams(tokens))
+        bigrams += _tuples_to_strings(list(nltk.bigrams(tokens)))
+        trigrams += _tuples_to_strings(list(nltk.trigrams(tokens)))
 
     features = _relevant_features(words, _WORD_FEATURE_COUNT)
     features += _relevant_features(bigrams, _BIGRAM_FEAUTRE_COUNT)
@@ -73,6 +99,7 @@ def _filter_junk(tokens: List[str]) -> List[str]:
     tokens = _filter_by_regex(_PUNCT_REGEX, tokens)
     tokens = _filter_by_regex(_NEWLINE_REGEX, tokens)
     tokens = _filter_by_regex(_EMPTY_REGEX, tokens)
+    tokens = _filter_by_regex(_CONTAINS_DIGIT_REGEX, tokens)
 
     return tokens
 
@@ -83,6 +110,10 @@ def _filter_by_regex(regex: Pattern, tokens: List[str]) -> List[str]:
 
 def _lowercase(tokens: List[str]) -> List[str]:
     return list(map(lambda token: token.lower(), tokens))
+
+
+def _tuples_to_strings(tuples: List[Tuple]) -> List[str]:
+    return list(map(" ".join, tuples))
 
 
 def _relevant_features(ngrams: List[str], relevancy_threshold: int) -> List[str]:
