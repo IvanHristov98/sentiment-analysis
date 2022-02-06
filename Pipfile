@@ -7,6 +7,8 @@ name = "pypi"
 spacy = "~=3.2.1"
 
 [dev-packages]
+black = "~=22.1.0"
+pylint = "~=2.12.2"
 
 [requires]
 python_version = "3.6"
