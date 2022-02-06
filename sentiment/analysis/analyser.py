@@ -14,6 +14,7 @@ def train(corpus: List[Comment]):
     for comment in corpus:
         tokens = tokenize(nlp, comment.text)
         tokens = filter_stop_words(tokens)
+        tokens = lemmatize(tokens)
 
         cnt += 1
 
@@ -30,3 +31,7 @@ def tokenize(nlp: English, text: str) -> List[Token]:
 
 def filter_stop_words(tokens: List[Token]) -> List[Token]:
     return list(filter(lambda token: not token.is_stop, tokens))
+
+
+def lemmatize(tokens: List[Token]) -> List[str]:
+    return list(map(lambda token: token.lemma_, tokens))
