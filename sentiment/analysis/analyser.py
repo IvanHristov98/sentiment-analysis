@@ -36,13 +36,13 @@ def extract_labeled_feature_sets(
     labeled_feature_sets = []
 
     for comment in corpus:
-        comment_features = _feature_set(nlp, comment, features)
+        comment_features = extract_feature_set(nlp, comment, features)
         labeled_feature_sets.append((comment_features, comment.sentiment.value))
 
     return labeled_feature_sets
 
 
-def _feature_set(nlp: English, comment: Comment, features: List[str]) -> Dict[str, bool]:
+def extract_feature_set(nlp: English, comment: Comment, features: List[str]) -> Dict[str, bool]:
     comment_features = set(extract_features(nlp, [comment]))
     feature_set = {}
 
