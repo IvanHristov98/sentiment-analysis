@@ -2,14 +2,14 @@
 
 import sentiment.parse as parser
 import sentiment.cmd.config as cfg
+from sentiment import analysis
 
 
 def main():
     airline_comments_path = cfg.airline_comments_path()
     corpus = parser.parse_airline_comments(airline_comments_path)
 
-    for comment in corpus:
-        print(comment.text)
+    analysis.train(corpus)
 
 
 if __name__ == "__main__":
