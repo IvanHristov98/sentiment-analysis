@@ -1,1 +1,1 @@
-from sentiment.analysis.analyser import train  # noqa
+from sentiment.analysis.analyser import train_classifier  # noqa

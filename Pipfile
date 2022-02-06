@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 spacy = "~=3.2.1"
+nltk = "~=3.6.7"
+matplotlib = "~=3.3.4"
 
 [dev-packages]
 black = "~=22.1.0"

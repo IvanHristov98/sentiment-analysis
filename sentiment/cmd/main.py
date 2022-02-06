@@ -9,7 +9,7 @@ def main():
     airline_comments_path = cfg.airline_comments_path()
     corpus = parser.parse_airline_comments(airline_comments_path)
 
-    analysis.train(corpus)
+    analysis.train_classifier(corpus)
 
 
 if __name__ == "__main__":
