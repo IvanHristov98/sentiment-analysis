@@ -5,6 +5,7 @@ import spacy
 import sentiment.parse as parser
 import sentiment.cmd.config as cfg
 from sentiment import analysis
+import sentiment.test as test
 
 
 def main():
@@ -12,9 +13,7 @@ def main():
     corpus = parser.parse_airline_comments(airline_comments_path)
 
     nlp = spacy.load("en_core_web_sm")
-
-    _, classifier = analysis.classifier(nlp, corpus)
-    classifier.show_most_informative_features()
+    test.run_fold_cross_validations(nlp, corpus)
 
 
 if __name__ == "__main__":

@@ -20,17 +20,17 @@ _BIGRAM_FEAUTRE_COUNT = 250
 _TRIGRAM_FEATURE_COUNT = 100
 
 
-def classifier(nlp: English, corpus: List[Comment]):
+def classifier(nlp: English, corpus: List[Comment]) -> Tuple[List[str], nltk.NaiveBayesClassifier]:
     print("Getting features...")
     features = extract_features(nlp, corpus)
     print("Labeling the features...")
-    labeled_feature_sets = _labeled_feature_sets(nlp, corpus, features)
+    labeled_feature_sets = extract_labeled_feature_sets(nlp, corpus, features)
 
     print("Training the NBC...")
-    return nltk.NaiveBayesClassifier.train(labeled_feature_sets)
+    return (features, nltk.NaiveBayesClassifier.train(labeled_feature_sets))
 
 
-def _labeled_feature_sets(
+def extract_labeled_feature_sets(
     nlp: English, corpus: List[Comment], features: List[str]
 ) -> List[Tuple[Dict[str, bool], str]]:
     labeled_feature_sets = []

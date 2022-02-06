@@ -15,3 +15,7 @@ install:
 .PHONY: run
 run:
 	@pipenv run ./sentiment/cmd/main.py
+
+.PHONY: test-acc
+test-acc:
+	@pipenv run ./sentiment/cmd/test.py
